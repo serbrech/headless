@@ -1,0 +1,15 @@
+apiVersion: skaffold/v2beta22
+kind: Config
+metadata:
+  name: broadcast
+build:
+  local: {}
+  artifacts:
+  - image: broadcast
+    buildpacks:
+      builder: gcr.io/buildpacks/builder:v1
+deploy:
+  kubeContext: kind-kind
+  kubectl:
+    manifests:
+    - deployment.yaml

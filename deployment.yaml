@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: broadcast
+  labels:
+    app: broadcast
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: broadcast
+  template:
+    metadata:
+      labels:
+        app: broadcast
+    spec:
+      containers:
+      - name: broadcast
+        image: broadcast:latest
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: target-svc
+  labels:
+    app: target
+spec:
+  ports:
+  - port: 1664
+    name: grpc
+    protocol: TCP
+    targetPort: grpc
+  clusterIP: None
+  selector:
+    app: target
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: target
+  labels:
+    app: target
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: target
+  template:
+    metadata:
+      labels:
+        app: target
+    spec:
+      containers:
+      - name: target
+        env:
+        - name: MODE
+          value: target
+        image: broadcast:latest
+        ports:
+        - containerPort: 9000
+          name: grpc
